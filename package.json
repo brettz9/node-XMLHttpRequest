@@ -1,11 +1,13 @@
 {
-  "name": "xmlhttprequest"
+  "name": "local-xmlhttprequest"
 , "description": "XMLHttpRequest for Node"
 , "version": "1.5.1"
 , "author": {
-    "name": "Dan DeFelippi"
-  , "url": "http://driverdan.com"
+    "name": "Brett Zamir"
+  , "email": "brettz9@yahoo.com"
+  , "url": "http://brett-zamir.me)"
   }
+, "contributors": ["Dan DeFelippi (http://driverdan.com)"]
 , "keywords": ["xhr", "ajax"]
 , "licenses": [{
     "type": "MIT"
@@ -13,9 +15,9 @@
   }]
 , "repository": {
     "type": "git"
-  , "url": "git://github.com/driverdan/node-XMLHttpRequest.git"
+  , "url": "git://github.com/brettz9/node-XMLHttpRequest.git"
   }
-, "bugs": "http://github.com/driverdan/node-XMLHttpRequest/issues"
+, "bugs": "https://github.com/brettz9/node-XMLHttpRequest/issues"
 , "engines": {
     "node": ">=0.4.0"
   }
