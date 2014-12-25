@@ -8,16 +8,44 @@ allow the use of existing libraries.
 
 Note: This library currently conforms to [XMLHttpRequest 1](http://www.w3.org/TR/XMLHttpRequest/). Version 2.0 will target [XMLHttpRequest Level 2](http://www.w3.org/TR/XMLHttpRequest2/).
 
+## Difference from original node-XMLHttpRequest ##
+
+When a protocol was missing from the [original node-XMLHttpRequest](https://github.com/driverdan/node-XMLHttpRequest/),
+`localhost` was intended to be assumed and any path determined relative to
+`localhost` root.
+
+This fork avoids the need for having a server set up and running, and
+instead assumes a local file.
+
+This project aims to ensure that the top-most requiring user-file is
+used for determining the base path (but not relative to unrelated
+higher executables like [nodeunit](https://github.com/caolan/nodeunit). More
+precisely speaking, the relativity of the path will be determined
+relative to the topmost file which meets either of the following
+criteria and is thus assumed to be the topmost user file:
+
+1. No `node_modules` folder is present.
+1. The file's nearest "node_modules" ancestor contains our
+node-XMLHttpRequest code (i.e., the user file has XMLHttpRequest as a dependency)
+
+This may not be perfect (and alternative ideas are welcome), but it
+is hoped it will allow the likes of `nodeunit` tests to be used with
+portable and easy to follow relative paths (not to mention with the
+possibility of reusing those same tests in the browser via the likes of
+[karma-nodeunit](https://github.com/karma-runner/karma-nodeunit)).
+
 ## Usage ##
 
 Here's how to include the module in your project and use as the browser-based
 XHR object.
 
-	var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+```js
+	var XMLHttpRequest = require("local-xmlhttprequest").XMLHttpRequest;
 	var xhr = new XMLHttpRequest();
+```
 
 Note: use the lowercase string "xmlhttprequest" in your require(). On
-case-sensitive systems (eg Linux) using uppercase letters won't work.
+case-sensitive systems (e.g., Linux) using uppercase letters won't work.
 
 ## Versions ##
 
