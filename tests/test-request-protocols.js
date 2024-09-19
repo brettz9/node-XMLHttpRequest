@@ -1,32 +1,32 @@
-var sys = require("util")
-  , assert = require("assert")
-  , XMLHttpRequest = require("../lib/XMLHttpRequest").XMLHttpRequest
-  , xhr;
+var sys = require('util'),
+  assert = require('assert'),
+  {XMLHttpRequest} = require('../lib/XMLHttpRequest'),
+  xhr;
 
 xhr = new XMLHttpRequest();
 
-xhr.onreadystatechange = function() {
+xhr.addEventListener('readystatechange', function () {
   if (this.readyState == 4) {
-    assert.equal("Hello World", this.responseText);
+    assert.equal('Hello World', this.responseText);
     runSync();
   }
-};
+});
 
 // Async
-var url = "file://" + __dirname + "/testdata.txt";
-xhr.open("GET", url);
+var url = 'file://' + __dirname + '/testdata.txt';
+xhr.open('GET', url);
 xhr.send();
 
 // Sync
-var runSync = function() {
+var runSync = function () {
   xhr = new XMLHttpRequest();
 
-  xhr.onreadystatechange = function() {
+  xhr.addEventListener('readystatechange', function () {
     if (this.readyState == 4) {
-      assert.equal("Hello World", this.responseText);
-      sys.puts("done");
+      assert.equal('Hello World', this.responseText);
+      sys.puts('done');
     }
-  };
-  xhr.open("GET", url, false);
+  });
+  xhr.open('GET', url, false);
   xhr.send();
-}
+};

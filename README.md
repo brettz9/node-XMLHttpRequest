@@ -40,8 +40,8 @@ Here's how to include the module in your project and use as the browser-based
 XHR object.
 
 ```js
-	var XMLHttpRequest = require("local-xmlhttprequest").XMLHttpRequest;
-	var xhr = new XMLHttpRequest();
+const {XMLHttpRequest} = require('local-xmlhttprequest');
+const xhr = new XMLHttpRequest();
 ```
 
 Note: use the lowercase string "xmlhttprequest" in your require(). On
