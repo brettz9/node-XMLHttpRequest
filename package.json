@@ -31,11 +31,11 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.5.5",
-    "eslint": "9.10.0",
-    "eslint-config-ash-nazg": "36.17.1",
-    "globals": "^15.9.0",
-    "typescript": "^5.6.2"
+    "@types/node": "^24.3.0",
+    "eslint": "9.34.0",
+    "eslint-config-ash-nazg": "39.0.1",
+    "globals": "^16.3.0",
+    "typescript": "^5.9.2"
   },
   "directories": {
     "lib": "./lib",
