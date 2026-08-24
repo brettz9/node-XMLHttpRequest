@@ -2,7 +2,7 @@
   "name": "local-xmlhttprequest",
   "type": "commonjs",
   "description": "XMLHttpRequest for Node",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "author": {
     "name": "Brett Zamir",
     "email": "brettz9@yahoo.com",
@@ -17,7 +17,8 @@
   ],
   "scripts": {
     "lint": "npm run eslint",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "test": "node scripts/run-tests.js"
   },
   "repository": {
     "type": "git",
@@ -29,10 +30,6 @@
     "node": ">=0.4.0"
   },
   "license": "MIT",
-  "dependencies": {
-    "array.prototype.find": "2.x",
-    "string.prototype.includes": "1.x"
-  },
   "devDependencies": {
     "eslint": "9.10.0",
     "eslint-config-ash-nazg": "36.17.1",

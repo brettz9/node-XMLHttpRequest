@@ -1,7 +1,9 @@
-var sys = require('util'),
+'use strict';
+
+let
   assert = require('assert'),
-  http = require('http'),
-  {XMLHttpRequest} = require('../lib/XMLHttpRequest'),
+  http = require('node:http'),
+  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
   xhr;
 
 // Test server
@@ -20,7 +22,7 @@ var server = http.createServer(function (req, res) {
   assert.equal(onreadystatechange, true);
   assert.equal(readystatechange, true);
   assert.equal(removed, true);
-  sys.puts('done');
+  console.log('done');
   this.close();
 }).listen(8000);
 

@@ -1,6 +1,8 @@
-var sys = require('util'),
+'use strict';
+
+let
   assert = require('assert'),
-  {XMLHttpRequest} = require('../lib/XMLHttpRequest'),
+  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
   xhr = new XMLHttpRequest();
 
 // Test constant values
@@ -10,4 +12,4 @@ assert.equal(2, xhr.HEADERS_RECEIVED);
 assert.equal(3, xhr.LOADING);
 assert.equal(4, xhr.DONE);
 
-sys.puts('done');
+console.log('done');

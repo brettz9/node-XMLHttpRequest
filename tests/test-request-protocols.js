@@ -1,6 +1,8 @@
-var sys = require('util'),
+'use strict';
+
+let
   assert = require('assert'),
-  {XMLHttpRequest} = require('../lib/XMLHttpRequest'),
+  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
   xhr;
 
 xhr = new XMLHttpRequest();
@@ -24,7 +26,7 @@ var runSync = function () {
   xhr.addEventListener('readystatechange', function () {
     if (this.readyState == 4) {
       assert.equal('Hello World', this.responseText);
-      sys.puts('done');
+      console.log('done');
     }
   });
   xhr.open('GET', url, false);

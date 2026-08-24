@@ -1,7 +1,9 @@
-var sys = require('util'),
+'use strict';
+
+let
   assert = require('assert'),
-  {XMLHttpRequest} = require('../lib/XMLHttpRequest'),
-  http = require('http'),
+  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
+  http = require('node:http'),
   xhr;
 
 // Test server
@@ -24,7 +26,7 @@ var server = http.createServer(function (req, res) {
 
   if (curMethod == methods.length - 1) {
     this.close();
-    sys.puts('done');
+    console.log('done');
   }
 }).listen(8000);
 
@@ -47,7 +49,7 @@ function start (method) {
       curMethod++;
 
       if (curMethod < methods.length) {
-        sys.puts('Testing ' + methods[curMethod]);
+        console.log('Testing ' + methods[curMethod]);
         start(methods[curMethod]);
       }
     }
@@ -58,5 +60,5 @@ function start (method) {
   xhr.send();
 }
 
-sys.puts('Testing ' + methods[curMethod]);
+console.log('Testing ' + methods[curMethod]);
 start(methods[curMethod]);

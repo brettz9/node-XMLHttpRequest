@@ -1,8 +1,10 @@
-var sys = require('util'),
+'use strict';
+
+let
   assert = require('assert'),
-  {XMLHttpRequest} = require('../lib/XMLHttpRequest'),
+  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
   xhr = new XMLHttpRequest(),
-  http = require('http');
+  http = require('node:http');
 
 // Test server
 var server = http.createServer(function (req, res) {
@@ -30,7 +32,7 @@ xhr.addEventListener('readystatechange', function () {
     assert.equal(xhr.status, 200);
     assert.equal(xhr.getRequestHeader('Location'), '');
     assert.equal(xhr.responseText, 'Hello World');
-    sys.puts('done');
+    console.log('done');
   }
 });
 

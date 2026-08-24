@@ -1,6 +1,8 @@
-var sys = require('util'),
+'use strict';
+
+let
   assert = require('assert'),
-  {XMLHttpRequest} = require('../lib/XMLHttpRequest'),
+  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
   xhr = new XMLHttpRequest();
 
 // Test request methods that aren't allowed

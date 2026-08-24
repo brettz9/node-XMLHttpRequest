@@ -1,7 +1,9 @@
-var sys = require('util'),
+'use strict';
+
+let
   assert = require('assert'),
-  http = require('http'),
-  {XMLHttpRequest} = require('../lib/XMLHttpRequest'),
+  http = require('node:http'),
+  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
   xhr;
 
 // Test server
@@ -12,7 +14,7 @@ function completeResponse (res, server, body) {
   assert.equal(readystatechange, true);
   assert.equal(removed, true);
   assert.equal(loadCount, body.length);
-  sys.puts('done');
+  console.log('done');
   server.close();
 }
 function push (res, piece) {
