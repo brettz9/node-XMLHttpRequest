@@ -24,6 +24,12 @@
     "xhr",
     "ajax"
   ],
+  "c8": {
+    "exclude": [
+      "tests",
+      "scripts/run-tests.js"
+    ]
+  },
   "scripts": {
     "prepublishOnly": "pnpm build && pnpm attw",
     "tsc": "tsc",
@@ -32,7 +38,7 @@
     "build": "pnpm rollup && tsc -p tsconfig-prod.json",
     "lint": "npm run eslint",
     "eslint": "eslint .",
-    "test": "node scripts/run-tests.js"
+    "test": "c8 node scripts/run-tests.js"
   },
   "repository": {
     "type": "git",
@@ -46,6 +52,7 @@
   "license": "MIT",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
+    "c8": "^12.0.0",
     "eslint": "10.9.1",
     "eslint-config-ash-nazg": "42.6.0",
     "globals": "^17.11.0",
