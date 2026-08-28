@@ -1,6 +1,6 @@
 /* eslint-disable n/no-sync -- Convenient */
 import assert from 'node:assert';
-import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
+import getXMLHttpRequest from '../src/XMLHttpRequest.js';
 
 // eslint-disable-next-line no-shadow -- Convenient
 const __dirname = import.meta.dirname;
@@ -8,12 +8,19 @@ const __dirname = import.meta.dirname;
 const XMLHttpRequest = getXMLHttpRequest();
 let xhr = new XMLHttpRequest();
 
-xhr.addEventListener('readystatechange', function () {
-  if (this.readyState === 4) {
-    assert.equal('Hello World', this.responseText);
-    runSync();
+xhr.addEventListener(
+  'readystatechange',
+  /**
+   * @this {import('../src/XMLHttpRequest.js').LocalXMLHttpRequestInstance}
+   * @returns {void}
+   */
+  function () {
+    if (this.readyState === 4) {
+      assert.equal('Hello World', this.responseText);
+      runSync();
+    }
   }
-});
+);
 
 // Async
 const url = 'file://' + __dirname + '/testdata.txt';
@@ -24,13 +31,20 @@ xhr.send();
 const runSync = function () {
   xhr = new XMLHttpRequest();
 
-  xhr.addEventListener('readystatechange', function () {
-    if (this.readyState === 4) {
-      assert.equal('Hello World', this.responseText);
-      // eslint-disable-next-line no-console -- Testing
-      console.log('done');
+  xhr.addEventListener(
+    'readystatechange',
+    /**
+     * @this {import('../src/XMLHttpRequest.js').LocalXMLHttpRequestInstance}
+     * @returns {void}
+     */
+    function () {
+      if (this.readyState === 4) {
+        assert.equal('Hello World', this.responseText);
+        // eslint-disable-next-line no-console -- Testing
+        console.log('done');
+      }
     }
-  });
+  );
   xhr.open('GET', url, false);
   xhr.send();
 };

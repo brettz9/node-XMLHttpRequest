@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
+import getXMLHttpRequest from '../src/XMLHttpRequest.js';
 
 const XMLHttpRequest = getXMLHttpRequest();
 const xhr = new XMLHttpRequest();

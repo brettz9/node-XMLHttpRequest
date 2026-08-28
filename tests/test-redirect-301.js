@@ -1,40 +1,55 @@
 import assert from 'node:assert';
 import http from 'node:http';
-import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
+import getXMLHttpRequest from '../src/XMLHttpRequest.js';
 
 const XMLHttpRequest = getXMLHttpRequest();
 const xhr = new XMLHttpRequest();
 
 // Test server
-http.createServer(function (req, res) {
-  if (req.url === '/redirectingResource') {
-    res.writeHead(301, {Location: 'http://localhost:8000/'});
+http.createServer(
+  /**
+   * @this {http.Server}
+   * @param {http.IncomingMessage} req
+   * @param {http.ServerResponse} res
+   * @returns {void}
+   */
+  function (req, res) {
+    if (req.url === '/redirectingResource') {
+      res.writeHead(301, {Location: 'http://localhost:8000/'});
+      res.end();
+      return;
+    }
+
+    const body = 'Hello World';
+    res.writeHead(200, {
+      'Content-Type': 'text/plain',
+      'Content-Length': Buffer.byteLength(body),
+      Date: 'Thu, 30 Aug 2012 18:17:53 GMT',
+      Connection: 'close'
+    });
+    res.write('Hello World');
     res.end();
-    return;
+
+    this.close();
   }
+).listen(8000);
 
-  const body = 'Hello World';
-  res.writeHead(200, {
-    'Content-Type': 'text/plain',
-    'Content-Length': Buffer.byteLength(body),
-    Date: 'Thu, 30 Aug 2012 18:17:53 GMT',
-    Connection: 'close'
-  });
-  res.write('Hello World');
-  res.end();
-
-  this.close();
-}).listen(8000);
-
-xhr.addEventListener('readystatechange', function () {
-  if (this.readyState === 4) {
-    assert.equal(xhr.status, 200);
-    assert.equal(xhr.getRequestHeader('Location'), '');
-    assert.equal(xhr.responseText, 'Hello World');
-    // eslint-disable-next-line no-console -- Testing
-    console.log('done');
+xhr.addEventListener(
+  'readystatechange',
+  /**
+   * @this {import('../src/XMLHttpRequest.js').LocalXMLHttpRequestInstance}
+   * @returns {void}
+   */
+  function () {
+    if (this.readyState === 4) {
+      assert.equal(xhr.status, 200);
+      assert.equal(xhr.getRequestHeader('Location'), '');
+      assert.equal(xhr.responseText, 'Hello World');
+      // eslint-disable-next-line no-console -- Testing
+      console.log('done');
+    }
   }
-});
+);
 
 try {
   xhr.open('GET', 'http://localhost:8000/redirectingResource');

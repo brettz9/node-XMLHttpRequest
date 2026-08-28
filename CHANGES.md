@@ -3,6 +3,7 @@
 ## 4.0.0 (unreleased)
 
 - feat: native ESM
+- feat: TypeScript
 
 ## 3.0.0
 

@@ -1,12 +1,12 @@
 export default [
   {
-    input: 'lib/XMLHttpRequest.js',
+    input: 'src/XMLHttpRequest.js',
     external: [
       'node:http', 'node:https', 'node:path', 'node:child_process',
       'node:fs'
     ],
     output: {
-      file: `dist/XMLHttpRequest.js`,
+      file: `dist/XMLHttpRequest.cjs`,
       format: 'cjs',
       sourcemap: true
     }

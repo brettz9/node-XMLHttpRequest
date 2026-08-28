@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "types": ["node"],
+    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "strict": true,
+    "target": "es2024",
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*.js", "src/**/*.cts"],
+  "exclude": ["node_modules"]
+}

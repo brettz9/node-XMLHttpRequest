@@ -1,13 +1,15 @@
 {
   "name": "local-xmlhttprequest",
   "type": "module",
-  "main": "./lib/XMLHttpRequest.js",
+  "main": "./src/XMLHttpRequest.js",
   "exports": {
     "import": {
-      "default": "./lib/XMLHttpRequest.js"
+      "types": "./dist/XMLHttpRequest.d.ts",
+      "default": "./src/XMLHttpRequest.js"
     },
     "require": {
-      "default": "./dist/XMLHttpRequest.js"
+      "types": "./dist/XMLHttpRequest.d.cts",
+      "default": "./dist/XMLHttpRequest.cjs"
     }
   },
   "description": "XMLHttpRequest for Node",
@@ -62,5 +64,8 @@
   "directories": {
     "lib": "./lib",
     "example": "./example"
+  },
+  "dependencies": {
+    "@types/node": "^26.4.0"
   }
 }

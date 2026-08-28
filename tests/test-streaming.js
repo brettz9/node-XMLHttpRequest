@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import http from 'node:http';
-import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
+import getXMLHttpRequest from '../src/XMLHttpRequest.js';
 
 // Test server
 
@@ -27,27 +27,35 @@ function completeResponse (res, server, body) {
 //   res.write(piece);
 // }
 
-http.createServer(function (req, res) {
-  const body = (req.method !== 'HEAD' ? ['Hello', 'World', 'Stream'] : []);
+http.createServer(
+  /**
+   * @this {http.Server}
+   * @param {http.IncomingMessage} req
+   * @param {http.ServerResponse} res
+   * @returns {void}
+   */
+  function (req, res) {
+    const body = (req.method !== 'HEAD' ? ['Hello', 'World', 'Stream'] : []);
 
-  res.writeHead(200, {
-    'Content-Type': 'text/plain',
-    'Content-Length': Buffer.byteLength(body.join(''))
-  });
+    res.writeHead(200, {
+      'Content-Type': 'text/plain',
+      'Content-Length': Buffer.byteLength(body.join(''))
+    });
 
-  let nextPiece = 0;
+    let nextPiece = 0;
 
-  const interval = setInterval(() => {
-    if (nextPiece < body.length) {
-      res.write(body[nextPiece]);
-      nextPiece++;
-    } else {
-      completeResponse(res, this, body);
-      clearInterval(interval);
-    }
-  // nagle may put writes together, if it happens rise the interval time
-  }, 100);
-}).listen(8000);
+    const interval = setInterval(() => {
+      if (nextPiece < body.length) {
+        res.write(body[nextPiece]);
+        nextPiece++;
+      } else {
+        completeResponse(res, this, body);
+        clearInterval(interval);
+      }
+    // nagle may put writes together, if it happens rise the interval time
+    }, 100);
+  }
+).listen(8000);
 
 const XMLHttpRequest = getXMLHttpRequest();
 const xhr = new XMLHttpRequest();

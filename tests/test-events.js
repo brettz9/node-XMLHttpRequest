@@ -1,29 +1,37 @@
 import assert from 'node:assert';
 import http from 'node:http';
-import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
+import getXMLHttpRequest from '../src/XMLHttpRequest.js';
 
 const XMLHttpRequest = getXMLHttpRequest();
 
 // Test server
-http.createServer(function (req, res) {
-  const body = (req.method !== 'HEAD' ? 'Hello World' : '');
+http.createServer(
+  /**
+   * @this {http.Server}
+   * @param {http.IncomingMessage} req
+   * @param {http.ServerResponse} res
+   * @returns {void}
+   */
+  function (req, res) {
+    const body = (req.method !== 'HEAD' ? 'Hello World' : '');
 
-  res.writeHead(200, {
-    'Content-Type': 'text/plain',
-    'Content-Length': Buffer.byteLength(body)
-  });
-  // HEAD has no body
-  if (req.method !== 'HEAD') {
-    res.write(body);
+    res.writeHead(200, {
+      'Content-Type': 'text/plain',
+      'Content-Length': Buffer.byteLength(body)
+    });
+    // HEAD has no body
+    if (req.method !== 'HEAD') {
+      res.write(body);
+    }
+    res.end();
+    assert.equal(onreadystatechange, true);
+    assert.equal(readystatechange, true);
+    assert.equal(removed, true);
+    // eslint-disable-next-line no-console -- Testing
+    console.log('done');
+    this.close();
   }
-  res.end();
-  assert.equal(onreadystatechange, true);
-  assert.equal(readystatechange, true);
-  assert.equal(removed, true);
-  // eslint-disable-next-line no-console -- Testing
-  console.log('done');
-  this.close();
-}).listen(8000);
+).listen(8000);
 
 const xhr = new XMLHttpRequest();
 

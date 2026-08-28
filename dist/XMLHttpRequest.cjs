@@ -1,3 +1,11 @@
+'use strict';
+
+var http = require('node:http');
+var https = require('node:https');
+var path = require('node:path');
+var node_child_process = require('node:child_process');
+var fs = require('node:fs');
+
 /* eslint-disable n/no-sync, n/prefer-promises/fs -- Polyfilling sync API */
 /**
  * Wrapper for built-in http.js to emulate the browser XMLHttpRequest object.
@@ -12,14 +20,17 @@
  * @license MIT
  */
 
-import http from 'node:http';
-import https from 'node:https';
-import path from 'node:path';
-import {spawn} from 'node:child_process';
-import fs from 'node:fs';
 
 // eslint-disable-next-line no-shadow -- Convenient
-const __dirname = import.meta.dirname;
+const __dirname$1 = undefined;
+
+/**
+ * @typedef {ReturnType<typeof localXMLHttpRequest>} LocalXMLHttpRequest
+ */
+
+/**
+ * @typedef {InstanceType<LocalXMLHttpRequest>} LocalXMLHttpRequestInstance
+ */
 
 /**
  * @typedef {number} Integer
@@ -77,7 +88,7 @@ const forbiddenRequestMethods = [
  * @returns {boolean} False if not allowed, otherwise true
  */
 const isAllowedHttpMethod = (method) => {
-  return (method && !forbiddenRequestMethods.includes(method));
+  return Boolean(method && !forbiddenRequestMethods.includes(method));
 };
 
 /**
@@ -93,8 +104,12 @@ const isAllowedHttpMethod = (method) => {
  *
  * @param {string} urlString
  * @returns {{
- *   protocol: (string|undefined), hostname: (string|undefined),
- *   port: (string|undefined), pathname: string, search: string, path: string
+ *   protocol: (string|undefined),
+ *   hostname: (string|undefined),
+ *   port: (string|undefined),
+ *   pathname: string,
+ *   search: string,
+ *   path: string
  * }}
  */
 function parseUrl (urlString) {
@@ -112,6 +127,7 @@ function parseUrl (urlString) {
   }
 }
 
+/* eslint-disable jsdoc/require-returns -- Let TS handle */
 /**
  * @param {{
  *   basePath?: string|false,
@@ -120,11 +136,11 @@ function parseUrl (urlString) {
  *     {type: string, bytes: Buffer|string}|undefined|null|false,
  *   readBlobSync?: (data: unknown) =>
  *     {type: string, bytes: Buffer|string}|undefined|null|false
- * }} [cfg]
- * @returns {XMLHttpRequest}
+ * }} [config]
  */
-function localXMLHttpRequest (cfg) {
-  cfg ||= {};
+function localXMLHttpRequest (config) {
+  /* eslint-enable jsdoc/require-returns -- Let TS handle */
+  const cfg = config || {};
 
   /**
    *
@@ -152,13 +168,24 @@ function localXMLHttpRequest (cfg) {
       // this._request;
       // this._response;
 
-      // Request settings
+      /**
+       * @type {{
+       *   async?: boolean,
+       *   method?: string,
+       *   url?: string,
+       *   user?: string|null,
+       *   password?: string|null
+       * }}
+       */
       this._settings = {};
 
       // Disable header blacklist.
       // Not part of XHR specs.
       this._disableHeaderCheck = false;
 
+      /**
+       * @type {Record<string, string|undefined>}
+       */
       this._headers = defaultHeaders;
 
       // Send flag
@@ -167,6 +194,7 @@ function localXMLHttpRequest (cfg) {
       this._errorFlag = false;
 
       // Event listeners
+      /** @type {Record<string, ((e?: Event) => AnyResponse)[]>} */
       this._listeners = {};
 
       /**
@@ -210,7 +238,9 @@ function localXMLHttpRequest (cfg) {
      */
     _isAllowedHttpHeader (header) {
       return this._disableHeaderCheck ||
-        (header && !forbiddenRequestHeaders.includes(header.toLowerCase()));
+        Boolean(
+          header && !forbiddenRequestHeaders.includes(header.toLowerCase())
+        );
     }
 
     /**
@@ -245,9 +275,9 @@ function localXMLHttpRequest (cfg) {
      *
      * @param {string} method method Connection method (eg GET, POST)
      * @param {string} url url URL for the connection.
-     * @param {boolean} async Asynchronous connection. Default is true.
-     * @param {string} user Username for basic authentication (optional)
-     * @param {string} password Password for basic authentication (optional)
+     * @param {boolean} [async] Asynchronous connection. Default is true.
+     * @param {string} [user] Username for basic authentication
+     * @param {string} [password] Password for basic authentication
      * @returns {void}
      */
     open (method, url, async, user, password) {
@@ -311,7 +341,7 @@ function localXMLHttpRequest (cfg) {
      * Gets a header from the server response.
      *
      * @param {string} header Name of header to get.
-     * @returns {string} Text of the header or null if it doesn't exist.
+     * @returns {string|null} Text of the header or null if it doesn't exist.
      */
     getResponseHeader (header) {
       if (typeof header === 'string' &&
@@ -321,7 +351,9 @@ function localXMLHttpRequest (cfg) {
         Object.hasOwn(this._response.headers, header.toLowerCase()) &&
         !this._errorFlag
       ) {
-        return this._response.headers[header.toLowerCase()];
+        return /** @type {string|null} */ (
+          this._response.headers[header.toLowerCase()]
+        );
       }
 
       return null;
@@ -337,13 +369,13 @@ function localXMLHttpRequest (cfg) {
         return '';
       }
       let result = '';
-      let i;
-      for (i in this._response.headers) {
-        if (Object.hasOwnProperty.call(this._response.headers, i)) {
-          // Cookie headers are excluded
-          if (i !== 'set-cookie' && i !== 'set-cookie2') {
-            result += i + ': ' + this._response.headers[i] + '\r\n';
-          }
+
+      // eslint-disable-next-line @stylistic/max-len -- Long
+      // eslint-disable-next-line unicorn/no-unreadable-for-of-expression -- Readable
+      for (const [i, header] of Object.entries(this._response?.headers ?? {})) {
+        // Cookie headers are excluded
+        if (i !== 'set-cookie' && i !== 'set-cookie2') {
+          result += i + ': ' + header + '\r\n';
         }
       }
       return result.slice(0, Math.max(0, result.length - 2));
@@ -358,7 +390,7 @@ function localXMLHttpRequest (cfg) {
     getRequestHeader (name) {
       // @TODO Make this case insensitive
       if (typeof name === 'string' && Object.hasOwn(this._headers, name)) {
-        return this._headers[name];
+        return /** @type {string} */ (this._headers[name]);
       }
 
       return '';
@@ -367,7 +399,8 @@ function localXMLHttpRequest (cfg) {
     /**
      * Sends the request to the server.
      *
-     * @param {string} data Optional data to send as request body.
+     * @param {null|string|Buffer<ArrayBufferLike>} [data] Optional data to
+     *   send as request body.
      * @returns {void}
      */
     send (data) {
@@ -397,7 +430,13 @@ function localXMLHttpRequest (cfg) {
       }
 
       let ssl = false, local = false, blobURL = false;
-      let url = parseUrl(this._settings.url);
+      let url =
+        /**
+         * @type {Partial<ReturnType<typeof parseUrl>> &
+         *   Required<Pick<Partial<ReturnType<typeof parseUrl>>, "pathname">>}
+         */ (
+          parseUrl(/** @type {string} */ (this._settings.url))
+        );
       let host;
 
       // A protocol-less (relative) URL normally means "read this path off
@@ -408,8 +447,14 @@ function localXMLHttpRequest (cfg) {
       //   when the method isn't GET and the consumer has supplied a real
       //   server origin via `cfg.baseURL`, resolve against that instead and
       //   let it fall through to the normal http/https handling below.
-      if (!url.protocol && this._settings.method !== 'GET' && cfg.baseURL) {
-        url = parseUrl(new URL(this._settings.url, cfg.baseURL).href);
+      if (
+        ((!('protocol' in url)) || !url.protocol) &&
+        this._settings.method !== 'GET' && cfg.baseURL
+      ) {
+        url = parseUrl(new URL(
+          /** @type {string} */ (this._settings.url),
+          cfg.baseURL
+        ).href);
       }
 
       const getStack = () => {
@@ -420,15 +465,18 @@ function localXMLHttpRequest (cfg) {
         // eslint-disable-next-line @stylistic/max-len -- Long
         // eslint-disable-next-line unicorn/error-message -- This is a stack trace
         const err = new Error();
-        // eslint-disable-next-line no-caller -- This is a stack trace
-        Error.captureStackTrace(err, arguments.callee);
+        // // eslint-disable-next-line no-caller -- This is a stack trace
+        // Error.captureStackTrace(err, arguments.callee);
         const {stack} = err;
         Error.prepareStackTrace = orig;
-        return stack;
+        return /** @type {NodeJS.CallSite[]} */ (
+          /** @type {unknown} */
+          (stack)
+        );
       };
 
       // Determine the server
-      switch (url.protocol) {
+      switch (/** @type {unknown} */ (url.protocol)) {
       case 'https:':
         ssl = true;
         // SSL & non-SSL both need host, no break here.
@@ -454,23 +502,31 @@ function localXMLHttpRequest (cfg) {
         //   during the same tick) when `cfg.basePath` isn't already given,
         //   since its result would otherwise go unused.
         const basePath = cfg.basePath ||
-          path.dirname(getStack().findLast((item) => {
-            const filename = item.getFileName();
-            const idx = filename.search(/[\/\\]node_modules[\/\\]/v);
-            // Should be a user file, as a node executable like nodeunit
-            //   ought to have node_modules in the path
-            if (idx === -1) {
-              return true;
-            }
-            // Should be a user file because its last "node_modules"
-            //   contains this XMLHttpRequest file (i.e., XMLHttpRequest
-            //   is a dependency of some kind)
-            return __dirname.includes(filename.slice(0, idx));
-          }).getFileName());
+          // eslint-disable-next-line @stylistic/wrap-iife -- Why not?
+          (function () {
+            const dir = getStack().findLast((item) => {
+              const filename = /** @type {string} */ (item.getFileName());
+              const idx = filename.search(/[\/\\]node_modules[\/\\]/v);
+              // Should be a user file, as a node executable like nodeunit
+              //   ought to have node_modules in the path
+              if (idx === -1) {
+                return true;
+              }
+              // Should be a user file because its last "node_modules"
+              //   contains this XMLHttpRequest file (i.e., XMLHttpRequest
+              //   is a dependency of some kind)
+              return __dirname$1.includes(filename.slice(0, idx));
+            })?.getFileName();
+            return path.dirname(/** @type {string} */ (dir));
+          })();
           // We should support this instead if the config were relative to URL
           // var pathName = new URL(this._settings.url, basePath).pathname;
 
-        const pathName = path.resolve(basePath, this._settings.url);
+        const pathName = path.resolve(
+          basePath,
+          /** @type {string} */
+          (this._settings.url)
+        );
         url = {pathname: pathName};
         local = true;
         break;
@@ -502,7 +558,7 @@ function localXMLHttpRequest (cfg) {
             this.status = 200;
             this._setState(this.DONE);
           } catch (e) {
-            this.handleError(e);
+            this.handleError(/** @type {Error} */ (e));
           }
         }
 
@@ -527,13 +583,15 @@ function localXMLHttpRequest (cfg) {
          */
         const respondWithBlob = () => {
           const resolved = cfg.resolveBlobURL &&
-            cfg.resolveBlobURL(this._settings.url);
+            cfg.resolveBlobURL(/** @type {string} */ (this._settings.url));
           if (!resolved) {
             this.handleError(new Error('Failed to load ' + this._settings.url));
             return;
           }
           this._response = {
-            headers: {'content-type': resolved.type || ''}
+            headers: /** @type {Record<string, string>} */ ({
+              'content-type': resolved.type || ''
+            })
           };
           this.status = 200;
           this.responseText = Buffer.isBuffer(resolved.bytes)
@@ -579,9 +637,9 @@ function localXMLHttpRequest (cfg) {
       if (this._settings.method === 'GET' || this._settings.method === 'HEAD') {
         data = null;
       } else if (data) {
-        this._headers['Content-Length'] = Buffer.isBuffer(data)
+        this._headers['Content-Length'] = String(Buffer.isBuffer(data)
           ? data.length
-          : Buffer.byteLength(data);
+          : Buffer.byteLength(data));
 
         if (!this._headers['Content-Type']) {
           this._headers['Content-Type'] = 'text/plain;charset=UTF-8';
@@ -589,7 +647,7 @@ function localXMLHttpRequest (cfg) {
       } else if (this._settings.method === 'POST') {
         // For a post with no data set Content-Length: 0.
         // This is required by buggy servers that don't meet the specs.
-        this._headers['Content-Length'] = 0;
+        this._headers['Content-Length'] = '0';
       }
 
       const options = {
@@ -601,30 +659,37 @@ function localXMLHttpRequest (cfg) {
         agent: false
       };
 
+      /** @type {typeof https.request | typeof http.request} */
       let doRequest;
 
       // Reset error flag
       this._errorFlag = false;
 
       // Error handler for the request
+      /**
+       * @param {Error} error
+       */
       const errorHandler = (error) => {
         this.handleError(error);
       };
 
-      // Handler for the response
-      // Called directly as a plain callback by `http(s).request` (not bound
-      //   to the XHR instance), so it must reference `self` -- a stray
-      //   `this` here would silently read/write the wrong object.
+      /**
+       * Handler for the response
+       * Called directly as a plain callback by `http(s).request` (not bound
+       * to the XHR instance), so it must reference `self` -- a stray
+       * `this` here would silently read/write the wrong object.
+       * @type {(res: http.IncomingMessage) => void}
+       */
       const responseHandler = (resp) => {
         // Set response var to the response we got back
         // This is so it remains accessable outside this scope
         this._response = resp;
         // Check for redirect
         // @TODO Prevent looped redirects
-        if ([301, 302, 303, 307].includes(this._response.statusCode)) {
+        if ([301, 302, 303, 307].includes(Number(this._response.statusCode))) {
           // Change URL to the redirect location
           this._settings.url = this._response.headers.location;
-          url = parseUrl(this._settings.url);
+          url = parseUrl(/** @type {string} */ (this._settings.url));
           // Set host var in case it's used later
           host = url.hostname;
           // Options for the new request
@@ -756,7 +821,7 @@ ${(data
 req.end();
 `;
         // Start the other Node Process, executing this string
-        const syncProc = spawn(process.argv[0], ['-e', execString]);
+        const syncProc = node_child_process.spawn(process.argv[0], ['-e', execString]);
         while (fs.existsSync(syncFile)) {
           // Wait while the sync file is empty
         }
@@ -767,7 +832,9 @@ req.end();
         fs.unlinkSync(contentFile);
         if ((this.responseText).startsWith('NODE-XMLHTTPREQUEST-ERROR:')) {
           // If the file returned an error, handle it
-          const errorObj = this.responseText.replace(/^NODE-XMLHTTPREQUEST-ERROR:/v, '');
+          const errorObj = new Error(
+            this.responseText.replace(/^NODE-XMLHTTPREQUEST-ERROR:/v, '')
+          );
           this.handleError(errorObj);
         } else {
           // If the file returned okay, parse its data and move to the
@@ -792,8 +859,8 @@ req.end();
      */
     handleError (error) {
       this.status = 503;
-      this.statusText = error;
-      this.responseText = error.stack;
+      this.statusText = error.message;
+      this.responseText = /** @type {string} */ (error.stack);
       this._errorFlag = true;
       this._setState(this.DONE);
     }
@@ -827,7 +894,7 @@ req.end();
     /**
      * Adds an event listener. Preferred method of binding to events.
      * @param {string} event
-     * @param {(e: Event) => AnyResponse} callback
+     * @param {(e?: Event) => AnyResponse} callback
      * @returns {void}
      */
     addEventListener (event, callback) {
@@ -859,16 +926,23 @@ req.end();
 
     /**
      * Dispatch any events, including both "on" methods and events
-     *  vattached using `addEventListener`.
-     * @param {string} event
+     *  attached using `addEventListener`.
+     * @param {"readystatechange"|"load"|"loadend"|"loadstart"} event
      * @returns {void}
      */
     dispatchEvent (event) {
-      if (typeof this['on' + event] === 'function') {
+      if (
+        [
+          'readystatechange', 'load', 'loadend', 'loadstart'
+        ].includes(event) &&
+        // @ts-expect-error -- Safe now
+        typeof this['on' + event] === 'function'
+      ) {
+        // @ts-expect-error -- Safe now
         this['on' + event]();
       }
       let i, len;
-      if (Object.hasOwnProperty.call(this._listeners, event)) {
+      if (Object.hasOwn(this._listeners, event)) {
         for (i = 0, len = this._listeners[event].length; i < len; i++) {
           this._listeners[event][i].call(this);
         }
@@ -891,4 +965,5 @@ req.end();
   return XMLHttpRequest;
 }
 
-export default localXMLHttpRequest;
+module.exports = localXMLHttpRequest;
+//# sourceMappingURL=XMLHttpRequest.cjs.map
