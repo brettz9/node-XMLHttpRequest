@@ -1,6 +1,6 @@
 # CHANGES for `local-xmlhttprequest`
 
-## 4.0.0 (unreleased)
+## 4.0.0
 
 - feat: native ESM
 - feat: TypeScript
