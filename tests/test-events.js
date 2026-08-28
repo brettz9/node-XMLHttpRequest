@@ -1,38 +1,37 @@
-'use strict';
+import assert from 'node:assert';
+import http from 'node:http';
+import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
 
-let
-  assert = require('assert'),
-  http = require('node:http'),
-  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
-  xhr;
+const XMLHttpRequest = getXMLHttpRequest();
 
 // Test server
-var server = http.createServer(function (req, res) {
-  const body = (req.method != 'HEAD' ? 'Hello World' : '');
+http.createServer(function (req, res) {
+  const body = (req.method !== 'HEAD' ? 'Hello World' : '');
 
   res.writeHead(200, {
     'Content-Type': 'text/plain',
     'Content-Length': Buffer.byteLength(body)
   });
   // HEAD has no body
-  if (req.method != 'HEAD') {
+  if (req.method !== 'HEAD') {
     res.write(body);
   }
   res.end();
   assert.equal(onreadystatechange, true);
   assert.equal(readystatechange, true);
   assert.equal(removed, true);
+  // eslint-disable-next-line no-console -- Testing
   console.log('done');
   this.close();
 }).listen(8000);
 
-xhr = new XMLHttpRequest();
+const xhr = new XMLHttpRequest();
 
 // Track event calls
-var onreadystatechange = false;
-var readystatechange = false;
-var removed = true;
-var removedEvent = function () {
+let onreadystatechange = false;
+let readystatechange = false;
+let removed = true;
+const removedEvent = function () {
   removed = false;
 };
 

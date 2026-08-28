@@ -1,46 +1,49 @@
-'use strict';
+import assert from 'node:assert';
+import http from 'node:http';
+import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
 
-let
-  assert = require('assert'),
-  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
-  http = require('node:http'),
-  xhr;
+const XMLHttpRequest = getXMLHttpRequest();
+
+// Test standard methods
+const methods = ['GET', 'POST', 'HEAD', 'PUT', 'DELETE'];
+let curMethod = 0;
 
 // Test server
-var server = http.createServer(function (req, res) {
+http.createServer(function (req, res) {
   // Check request method and URL
   assert.equal(methods[curMethod], req.method);
   assert.equal('/' + methods[curMethod], req.url);
 
-  const body = (req.method != 'HEAD' ? 'Hello World' : '');
+  const body = (req.method !== 'HEAD' ? 'Hello World' : '');
 
   res.writeHead(200, {
     'Content-Type': 'text/plain',
     'Content-Length': Buffer.byteLength(body)
   });
   // HEAD has no body
-  if (req.method != 'HEAD') {
+  if (req.method !== 'HEAD') {
     res.write(body);
   }
   res.end();
 
-  if (curMethod == methods.length - 1) {
+  if (curMethod === methods.length - 1) {
     this.close();
+    // eslint-disable-next-line no-console -- Testing
     console.log('done');
   }
 }).listen(8000);
 
-// Test standard methods
-var methods = ['GET', 'POST', 'HEAD', 'PUT', 'DELETE'];
-var curMethod = 0;
-
+/**
+ * @param {string} method
+ * @returns {void}
+ */
 function start (method) {
   // Reset each time
-  xhr = new XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
 
   xhr.addEventListener('readystatechange', function () {
-    if (this.readyState == 4) {
-      if (method == 'HEAD') {
+    if (this.readyState === 4) {
+      if (method === 'HEAD') {
         assert.equal('', this.responseText);
       } else {
         assert.equal('Hello World', this.responseText);
@@ -49,6 +52,7 @@ function start (method) {
       curMethod++;
 
       if (curMethod < methods.length) {
+        // eslint-disable-next-line no-console -- Testing
         console.log('Testing ' + methods[curMethod]);
         start(methods[curMethod]);
       }
@@ -60,5 +64,6 @@ function start (method) {
   xhr.send();
 }
 
+// eslint-disable-next-line no-console -- Testing
 console.log('Testing ' + methods[curMethod]);
 start(methods[curMethod]);

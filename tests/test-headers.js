@@ -1,19 +1,18 @@
-'use strict';
+import assert from 'node:assert';
+import http from 'node:http';
+import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
 
-let
-  assert = require('assert'),
-  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
-  xhr = new XMLHttpRequest(),
-  http = require('node:http');
+const XMLHttpRequest = getXMLHttpRequest();
+const xhr = new XMLHttpRequest();
 
 // Test server
-var server = http.createServer(function (req, res) {
+http.createServer(function (req, res) {
   // Test setRequestHeader
   assert.equal('Foobar', req.headers['x-test']);
   // Test non-conforming allowed header
   assert.equal('node-XMLHttpRequest-test', req.headers['user-agent']);
   // Test header set with blacklist disabled
-  assert.equal('http://github.com', req.headers.referer);
+  assert.equal('https://github.com', req.headers.referer);
 
   const body = 'Hello World';
   res.writeHead(200, {
@@ -33,9 +32,13 @@ var server = http.createServer(function (req, res) {
 }).listen(8000);
 
 xhr.addEventListener('readystatechange', function () {
-  if (this.readyState == 4) {
+  if (this.readyState === 4) {
     // Test getAllResponseHeaders()
-    const headers = 'content-type: text/plain\r\ncontent-length: 11\r\ndate: Thu, 30 Aug 2012 18:17:53 GMT\r\nconnection: close';
+    const headers = `content-type: text/plain\r
+content-length: 11\r
+date: Thu, 30 Aug 2012 18:17:53 GMT\r
+connection: close`;
+
     assert.equal(headers, this.getAllResponseHeaders());
 
     // Test case insensitivity
@@ -49,6 +52,7 @@ xhr.addEventListener('readystatechange', function () {
     assert.equal('', this.getAllResponseHeaders());
     assert.equal(null, this.getResponseHeader('Connection'));
 
+    // eslint-disable-next-line no-console -- Testing
     console.log('done');
   }
 });
@@ -69,10 +73,11 @@ try {
 
   // Test allowing all headers
   xhr.setDisableHeaderCheck(true);
-  xhr.setRequestHeader('Referer', 'http://github.com');
-  assert.equal('http://github.com', xhr.getRequestHeader('Referer'));
+  xhr.setRequestHeader('Referer', 'https://github.com');
+  assert.equal('https://github.com', xhr.getRequestHeader('Referer'));
 
   xhr.send();
 } catch (e) {
+  // eslint-disable-next-line no-console -- Testing
   console.log('ERROR: Exception raised', e);
 }

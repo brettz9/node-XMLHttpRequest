@@ -1,8 +1,17 @@
 {
   "name": "local-xmlhttprequest",
-  "type": "commonjs",
+  "type": "module",
+  "main": "./lib/XMLHttpRequest.js",
+  "exports": {
+    "import": {
+      "default": "./lib/XMLHttpRequest.js"
+    },
+    "require": {
+      "default": "./dist/XMLHttpRequest.js"
+    }
+  },
   "description": "XMLHttpRequest for Node",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "author": {
     "name": "Brett Zamir",
     "email": "brettz9@yahoo.com",
@@ -16,6 +25,11 @@
     "ajax"
   ],
   "scripts": {
+    "prepublishOnly": "pnpm build && pnpm attw",
+    "tsc": "tsc",
+    "attw": "attw --pack . --profile node16",
+    "rollup": "rollup -c",
+    "build": "pnpm rollup && tsc -p tsconfig-prod.json",
     "lint": "npm run eslint",
     "eslint": "eslint .",
     "test": "node scripts/run-tests.js"
@@ -27,17 +41,19 @@
   "homepage": "https://github.com/brettz9/node-XMLHttpRequest",
   "bugs": "https://github.com/brettz9/node-XMLHttpRequest/issues",
   "engines": {
-    "node": ">=0.4.0"
+    "node": "^22.18.0 || >= 24.11.0"
   },
   "license": "MIT",
   "devDependencies": {
-    "eslint": "9.10.0",
-    "eslint-config-ash-nazg": "36.17.1",
-    "globals": "^15.9.0"
+    "@arethetypeswrong/cli": "^0.18.5",
+    "eslint": "10.9.1",
+    "eslint-config-ash-nazg": "42.6.0",
+    "globals": "^17.11.0",
+    "rollup": "^4.63.0",
+    "typescript": "^7.0.2"
   },
   "directories": {
     "lib": "./lib",
     "example": "./example"
-  },
-  "main": "./lib/XMLHttpRequest.js"
+  }
 }

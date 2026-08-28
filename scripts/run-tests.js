@@ -1,14 +1,16 @@
-'use strict';
+/* eslint-disable n/no-sync -- Build only */
+import fs from 'node:fs';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
 
-const fs = require('node:fs');
-const path = require('node:path');
-const {spawnSync} = require('node:child_process');
+// eslint-disable-next-line no-shadow -- Convenient
+const __dirname = import.meta.dirname;
 
 const testsDir = path.join(__dirname, '..', 'tests');
 
 const testFiles = fs.readdirSync(testsDir).
   filter((file) => file.startsWith('test-') && file.endsWith('.js')).
-  sort();
+  toSorted((a, b) => a.localeCompare(b));
 
 let failures = 0;
 
@@ -22,7 +24,9 @@ for (const file of testFiles) {
   }
 }
 
-console.log(`\n${testFiles.length - failures}/${testFiles.length} test files passed.`);
+console.log(
+  `\n${testFiles.length - failures}/${testFiles.length} test files passed.`
+);
 
 if (failures > 0) {
   process.exitCode = 1;

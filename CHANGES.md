@@ -1,5 +1,9 @@
 # CHANGES for `local-xmlhttprequest`
 
+## 4.0.0 (unreleased)
+
+- feat: native ESM
+
 ## 3.0.0
 
 (Shouldn't be breaking, but didn't verify in detail.)

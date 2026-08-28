@@ -1,13 +1,11 @@
-'use strict';
-
-let
-  assert = require('assert'),
-  XMLHttpRequest = require('../lib/XMLHttpRequest')(),
-  xhr = new XMLHttpRequest(),
-  http = require('node:http');
+import assert from 'node:assert';
+import http from 'node:http';
+import getXMLHttpRequest from '../lib/XMLHttpRequest.js';
+const XMLHttpRequest = getXMLHttpRequest();
+const xhr = new XMLHttpRequest();
 
 // Test server
-var server = http.createServer(function (req, res) {
+http.createServer(function (req, res) {
   if (req.url === '/redirectingResource') {
     res.writeHead(302, {Location: 'http://localhost:8000/'});
     res.end();
@@ -28,9 +26,10 @@ var server = http.createServer(function (req, res) {
 }).listen(8000);
 
 xhr.addEventListener('readystatechange', function () {
-  if (this.readyState == 4) {
+  if (this.readyState === 4) {
     assert.equal(xhr.getRequestHeader('Location'), '');
     assert.equal(xhr.responseText, 'Hello World');
+    // eslint-disable-next-line no-console -- Testing
     console.log('done');
   }
 });
@@ -39,5 +38,6 @@ try {
   xhr.open('GET', 'http://localhost:8000/redirectingResource');
   xhr.send();
 } catch (e) {
+  // eslint-disable-next-line no-console -- Testing
   console.log('ERROR: Exception raised', e);
 }

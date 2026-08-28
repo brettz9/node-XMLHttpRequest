@@ -1,3 +1,11 @@
+'use strict';
+
+var http = require('node:http');
+var https = require('node:https');
+var path = require('node:path');
+var node_child_process = require('node:child_process');
+var fs = require('node:fs');
+
 /* eslint-disable n/no-sync, n/prefer-promises/fs -- Polyfilling sync API */
 /**
  * Wrapper for built-in http.js to emulate the browser XMLHttpRequest object.
@@ -12,14 +20,9 @@
  * @license MIT
  */
 
-import http from 'node:http';
-import https from 'node:https';
-import path from 'node:path';
-import {spawn} from 'node:child_process';
-import fs from 'node:fs';
 
 // eslint-disable-next-line no-shadow -- Convenient
-const __dirname = import.meta.dirname;
+const __dirname$1 = undefined;
 
 /**
  * @typedef {number} Integer
@@ -465,7 +468,7 @@ function localXMLHttpRequest (cfg) {
             // Should be a user file because its last "node_modules"
             //   contains this XMLHttpRequest file (i.e., XMLHttpRequest
             //   is a dependency of some kind)
-            return __dirname.includes(filename.slice(0, idx));
+            return __dirname$1.includes(filename.slice(0, idx));
           }).getFileName());
           // We should support this instead if the config were relative to URL
           // var pathName = new URL(this._settings.url, basePath).pathname;
@@ -756,7 +759,7 @@ ${(data
 req.end();
 `;
         // Start the other Node Process, executing this string
-        const syncProc = spawn(process.argv[0], ['-e', execString]);
+        const syncProc = node_child_process.spawn(process.argv[0], ['-e', execString]);
         while (fs.existsSync(syncFile)) {
           // Wait while the sync file is empty
         }
@@ -891,4 +894,5 @@ req.end();
   return XMLHttpRequest;
 }
 
-export default localXMLHttpRequest;
+module.exports = localXMLHttpRequest;
+//# sourceMappingURL=XMLHttpRequest.js.map
