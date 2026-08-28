@@ -1,4 +1,4 @@
-# node-XMLHttpRequest #
+# node-XMLHttpRequest
 
 node-XMLHttpRequest is a wrapper for the built-in http client to emulate the
 browser XMLHttpRequest object.
@@ -8,7 +8,7 @@ allow the use of existing libraries.
 
 Note: This library currently conforms to [XMLHttpRequest 1](http://www.w3.org/TR/XMLHttpRequest/). Version 2.0 will target [XMLHttpRequest Level 2](http://www.w3.org/TR/XMLHttpRequest2/).
 
-## Difference from original node-XMLHttpRequest ##
+## Difference from original node-XMLHttpRequest
 
 When a protocol was missing from the [original node-XMLHttpRequest](https://github.com/driverdan/node-XMLHttpRequest/),
 `localhost` was intended to be assumed and any path determined relative to
@@ -34,20 +34,21 @@ portable and easy to follow relative paths (not to mention with the
 possibility of reusing those same tests in the browser via the likes of
 [karma-nodeunit](https://github.com/karma-runner/karma-nodeunit)).
 
-## Usage ##
+## Usage
 
 Here's how to include the module in your project and use as the browser-based
 XHR object.
 
 ```js
-const {XMLHttpRequest} = require('local-xmlhttprequest');
+import getXMLHttpRequest from 'local-xmlhttprequest';
+const XMLHttpRequest = getXMLHttpRequest();
 const xhr = new XMLHttpRequest();
 ```
 
 Note: use the lowercase string "xmlhttprequest" in your require(). On
 case-sensitive systems (e.g., Linux) using uppercase letters won't work.
 
-## Versions ##
+## Versions
 
 Prior to 1.4.0 version numbers were arbitrary. From 1.4.0 on they conform to
 the standard major.minor.bugfix. 1.x shouldn't necessarily be considered
@@ -58,11 +59,11 @@ well. Major version numbers indicate significant core code changes.
 Minor versions indicate minor core code changes or better conformity to
 the W3C spec.
 
-## License ##
+## License
 
 MIT license. See LICENSE for full details.
 
-## Supports ##
+## Supports
 
 * Async and synchronous requests
 * GET, POST, PUT, and DELETE requests
@@ -70,7 +71,7 @@ MIT license. See LICENSE for full details.
   getAllRequestHeaders, event methods)
 * Requests to all domains
 
-## Known Issues / Missing Features ##
+## Known Issues / Missing Features
 
 For a list of open issues or to report your own visit the [github issues
 page](https://github.com/driverdan/node-XMLHttpRequest/issues).
