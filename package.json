@@ -27,6 +27,11 @@
     "ajax"
   ],
   "c8": {
+    "check-coverage": true,
+    "statements": 100,
+    "lines": 100,
+    "branches": 100,
+    "functions": 100,
     "exclude": [
       "tests",
       "scripts/run-tests.js"
