@@ -18,10 +18,12 @@ for (const file of testFiles) {
   const filePath = path.join(testsDir, file);
   console.log(`\n--- ${file} ---`);
   const {status} = spawnSync(process.execPath, [filePath], {stdio: 'inherit'});
-  if (status !== 0) {
-    failures++;
-    console.error(`FAILED: ${file}`);
+  if (status === 0) {
+    continue;
   }
+
+  failures++;
+  console.error(`FAILED: ${file}`);
 }
 
 console.log(

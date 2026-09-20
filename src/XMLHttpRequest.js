@@ -289,7 +289,7 @@ function localXMLHttpRequest (config) {
       this._settings = {
         method,
         url: url.toString(),
-        async: (typeof async !== 'boolean' ? true : async),
+        async: ((typeof async !== 'boolean') || async),
         user: user || null,
         password: password || null
       };
