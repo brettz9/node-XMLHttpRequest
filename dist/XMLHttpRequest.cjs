@@ -186,7 +186,7 @@ function localXMLHttpRequest (config) {
       /**
        * @type {Record<string, string|undefined>}
        */
-      this._headers = defaultHeaders;
+      this._headers = {...defaultHeaders};
 
       // Send flag
       this._sendFlag = false;
@@ -509,12 +509,20 @@ function localXMLHttpRequest (config) {
               const idx = filename.search(/[\/\\]node_modules[\/\\]/v);
               // Should be a user file, as a node executable like nodeunit
               //   ought to have node_modules in the path
+              //
+              // The `idx !== -1` path below (should be a user file because
+              //   its last "node_modules" contains this XMLHttpRequest
+              //   file, i.e. XMLHttpRequest is a dependency of some kind)
+              //   is unreachable in practice: `findLast` walks the stack
+              //   outermost-frame-first, and the outermost frame is always
+              //   a `node:internal/...` entry, which never matches
+              //   `node_modules` and so always satisfies this `idx === -1`
+              //   check first, short-circuiting before that path is ever
+              //   consulted.
               if (idx === -1) {
                 return true;
               }
-              // Should be a user file because its last "node_modules"
-              //   contains this XMLHttpRequest file (i.e., XMLHttpRequest
-              //   is a dependency of some kind)
+              /* c8 ignore next -- see comment above: unreachable */
               return __dirname$1.includes(filename.slice(0, idx));
             })?.getFileName();
             return path.dirname(/** @type {string} */ (dir));
@@ -624,7 +632,8 @@ function localXMLHttpRequest (config) {
 
       // Set Basic Auth if necessary
       if (this._settings.user) {
-        if (this._settings.password === undefined) {
+        if (this._settings.password === undefined ||
+            this._settings.password === null) {
           this._settings.password = '';
         }
         const authBuf = Buffer.from(
@@ -777,7 +786,7 @@ import https from 'node:https';
 import fs from 'node:fs';
 
 const doRequest = http${ssl ? 's' : ''}.request;
-const options = '${JSON.stringify(options)}';
+const options = ${JSON.stringify(options)};
 
 let responseText = '';
 const req = doRequest(options, function (response) {
@@ -790,7 +799,7 @@ const req = doRequest(options, function (response) {
   response.on('end', function () {
     fs.writeFileSync(
       '${contentFile}',
-      'NODE-XMLHTTPREQUEST-STATUS:' + response.statusCode +
+      'NODE-XMLHTTPREQUEST-STATUS:' + response.statusCode + ',' +
         responseText,
       'utf8'
     );
@@ -799,7 +808,7 @@ const req = doRequest(options, function (response) {
   response.on('error', function(error) {
     fs.writeFileSync(
       '${contentFile}',
-      'NODE-XMLHTTPREQUEST-ERROR:' + JSON.stringify(error)},
+      'NODE-XMLHTTPREQUEST-ERROR:' + JSON.stringify(error),
       'utf8'
     );
     fs.unlinkSync('${syncFile}');
@@ -875,7 +884,7 @@ req.end();
         this._request = null;
       }
 
-      this._headers = defaultHeaders;
+      this._headers = {...defaultHeaders};
       this.responseText = '';
       this.responseXML = '';
 
